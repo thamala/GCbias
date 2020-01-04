@@ -1,0 +1,52 @@
+//script for estimating GB-biased gene conversion under selfing
+
+initialize() {
+	defineConstant("L", 50000);
+	defineConstant("alpha", 7e-9);
+ 	initializeSLiMOptions(nucleotideBased=T);
+ 	initializeAncestralNucleotides(randomNucleotides(L));
+ 	initializeMutationTypeNuc("m1", 0.5, "f", 0.0);
+ 	initializeGenomicElementType("g1", m1, 1.0, mmJukesCantor(alpha));
+ 	initializeGenomicElement(g1, 0, L-1);
+ 	initializeRecombinationRate(4e-7);
+	initializeGeneConversion(0.9, 334, 0, 0.2);
+}
+
+1 {
+	sim.addSubpop("p1", 250000);
+	p1.setSelfingRate(0.95);
+}
+
+1500000 late(){
+	anc = sim.chromosome.ancestralNucleotides(format="integer");
+	n = length(anc)-1;
+	ws = 0;
+	sw = 0;
+	s = 0;
+	
+	samp = sample(p1.genomes, 100, T);
+	
+	for(ind in samp){
+		der = ind.nucleotides(format="integer");
+		
+		for(i in 0:n){
+			if((anc[i] == 0 | anc[i] == 3) & (der[i] == 2 | der[i] == 1)){
+				ws = ws + 1;
+			}
+			if((anc[i] == 2 | anc[i] == 1) & (der[i] == 0 | der[i] == 3)){
+				sw = sw + 1;
+			}
+			if(anc[i] != der[i]){
+				s = s + 1;
+			}
+		}
+	}
+	
+	ws = ws / s;
+	sw = sw / s;
+	nuc = nucleotideFrequencies(sim.chromosome.ancestralNucleotides());
+	gc = (nuc[1] + nuc[2]) / sum(nuc);
+	
+	catn(ws/sw+"\t"+gc);
+}
+
