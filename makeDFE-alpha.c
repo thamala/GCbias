@@ -30,7 +30,7 @@
  example:
  ./makeDFE-alpha -coord thaliana-lyrata.filt.coord -div thaliana-lyrata.filt.snps -sites 4fold.sites -vcf thaliana.full.vcf -gc 1 > out.4fold.WS.txt
  
- The program assumes that all files are sorted by chromosome and position, and that chromosomes are identified with numbers (e.g. 1 and not chr1)
+ The program was written for A.thaliana data. It assumes that all files are sorted by chromosome and position, chromosomes are identified with numbers (e.g. 1 and not chr1), and VCF-file contains no heterozygote sites.
  */
 
 #include <stdio.h>
